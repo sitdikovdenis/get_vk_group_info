@@ -14,5 +14,4 @@ params = {
 }
 
 r = requests.get('https://api.vk.com/method/utils.resolveScreenName', params=params)
-
 print(r.content)

@@ -3,23 +3,30 @@ import sqlite3
 conn = sqlite3.connect("mydatabase.db")
 cursor = conn.cursor()
 
-sql = "DELETE FROM vk_groups"
+# Создание таблицы со списком групп
+sql_create_groups_table_query = """create table if not exists vk_group (
+                                       group_name VARCHAR(256) NOT NULL,
+                                       group_id INTEGER PRIMARY KEY
+                                   )"""
 
-cursor.execute(sql)
-conn.commit()
+sql_create_groups_info_table_query = """create table if not exists vk_group_info (
+                                            id integer PRIMARY KEY, 
+                                            user_count INTEGER,
+                                            group_id INTEGER,
+                                            FOREIGN KEY (group_id) REFERENCES vk_group (group_id)
+                                   )"""
 
-a = cursor.execute("""select * from vk_groups"""
-               )
+cursor.execute(sql_create_groups_table_query)
+cursor.execute(sql_create_groups_info_table_query)
 
-print(cursor.fetchall())
 
-# # Создание таблицы
-# cursor.execute("""create table if not exists vk_groups (name text)
-#                """)
-#
-#
-# cursor.execute("""INSERT INTO vk_groups
-#                   VALUES ('Glow')"""
+
+# cursor.execute("""DELETE FROM vk_groups"""
 #                )
 #
 # conn.commit()
+
+a = cursor.execute("""select * from vk_groups""")
+print(cursor.fetchall())
+a = cursor.execute("""select * from vk_group_info""")
+print(cursor.fetchall())
