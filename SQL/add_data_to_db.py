@@ -1,7 +1,10 @@
 import sqlite3
 import settings
-import requests
-import json
+from vk_integration import vk_api
+from SQL import sql_query
+
+# sql = sql_query.SQL()
+
 
 conn = sqlite3.connect("mydatabase.db")
 cursor = conn.cursor()
@@ -19,45 +22,35 @@ sql_create_groups_info_table_query = """create table if not exists vk_group_info
                                             FOREIGN KEY (group_id) REFERENCES vk_group (group_id)
                                    )"""
 
-sql_update_groups_table_query_template = """INSERT INTO vk_group (group_name, group_id)
+sql_update_groups_table_query_template = """INSERT OR REPLACE INTO vk_group (group_name, group_id)
                                             VALUES ( '%s',
                                                      %d                                                     
                                                     )"""
 
+with sql_query.SQL() as sql:
+    # cursor.execute(sql_create_groups_table_query)
+    # cursor.execute(sql_create_groups_info_table_query)
 
-cursor.execute(sql_create_groups_table_query)
-cursor.execute(sql_create_groups_info_table_query)
+    vk = vk_api.VKAPI(settings.access_token)
 
-for group in settings.groups:
-    group_name = group.split('/')[1]
-    params = {
-        "screen_name": "rambler",
-        'v': '5.52',
-        'access_token': '914bdeb3aa6078c1ce41630a4fd13c6b1cb1065296452cb88c6d851065b87c043635d68b3ef5e7f25e10e'
-    }
-    response = requests.get('https://api.vk.com/method/utils.resolveScreenName', params=params)
+    for group in settings.groups:
+        group_name = group.split('/')[1]
+        group_id = vk.get_group_id(group_name)
+        # sql_update_groups_table_query = sql_update_groups_table_query_template % (group_name, group_id)
+        # print(group_name, group_id)
+        # cursor.execute(sql_update_groups_table_query)
+        sql.update_group(group_id, group_name)
+    # conn.commit()
 
-    response = response.content.decode('utf8').replace("'", '"')
-    group_info_json = json.loads(response).get('response')
-    group_id = group_info_json.get('object_id')
-    sql_update_groups_table_query = sql_update_groups_table_query_template % (group_name, group_id)
-    print(sql_update_groups_table_query)
-    cursor.execute(sql_update_groups_table_query)
-    conn.commit()
-    a = cursor.execute("""select * from vk_group""")
-    print(cursor.fetchall())
-
+    groups = sql.get_group_by_id()
+    print(groups)
 
 # cursor.execute("""DELETE FROM vk_group"""
 #                )
 #
 # conn.commit()
-
-# with conn:
-#     cursor.execute("INSERT INTO vk_group VALUES (?, 23424434)", ('Algorithm',))
-# conn.commit()
 #
-a = cursor.execute("""select * from vk_group""")
-print(cursor.fetchall())
+#
+#
 # a = cursor.execute("""select * from vk_group_info""")
 # print(cursor.fetchall())
