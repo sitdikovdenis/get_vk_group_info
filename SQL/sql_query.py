@@ -32,8 +32,12 @@ class SQL:
         :return:
         """
         sql_update_groups_table_query_template = f"""INSERT OR REPLACE INTO vk_group (group_name, group_id)
-                                                    VALUES ( '{name}',
+                                                    VALUES ('{name}',
                                                              {id}                                                     
                                                             )"""
         self.cursor.execute(sql_update_groups_table_query_template)
         self.conn.commit()
+
+    def create_table(self, table_name, *fields):
+        query = f"""create table if not exists {table_name} (%s) """ % ',\n'.join(str(field) for field in fields)
+        self.cursor.execute(query)
