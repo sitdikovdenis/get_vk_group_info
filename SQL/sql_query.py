@@ -1,10 +1,14 @@
+import os
 import sqlite3
 import settings
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, "mydatabase.db")
 
 
 class SQL:
     def __enter__(self):
-        self.conn = sqlite3.connect("mydatabase.db")
+        self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
         return self
 
@@ -13,7 +17,7 @@ class SQL:
 
     def get_group_by_id(self, id=-1):
         """
-        Получить информацию о группе
+        Получить группу
         :param id: ИД группы. Если значение не передано, вернутся все группы
         :return:
         """
@@ -24,20 +28,23 @@ class SQL:
                                """)
         return self.cursor.fetchall()
 
-    def update_group(self, id, name):
-        """
-        Функция добавляет или обновляет информацию о группе в БД
-        :param id: ИД группы. Если запись с таким ИД найдена, обновляется информация
-        :param name: Имя группы
-        :return:
-        """
-        sql_update_groups_table_query_template = f"""INSERT OR REPLACE INTO vk_group (group_name, group_id)
-                                                    VALUES ('{name}',
-                                                             {id}                                                     
-                                                            )"""
-        self.cursor.execute(sql_update_groups_table_query_template)
-        self.conn.commit()
-
     def create_table(self, table_name, *fields):
         query = f"""create table if not exists {table_name} (%s) """ % ',\n'.join(str(field) for field in fields)
         self.cursor.execute(query)
+
+    def update_table(self, table_name, **fields):
+        """
+        Обновить данные в таблице
+        :param table_name: имя таблицы
+        :param fields: dict, ключ = имя столбца, значение = значение столбца
+        :return:
+        """
+        sql_update_groups_table_query_template = \
+            f"""INSERT OR REPLACE INTO {table_name}
+            (%s)
+             VALUES (%s)
+             """ % (','.join(f"'{str(field)}'" for field in fields),
+                    ','.join(f"'{str(field)}'" for field in fields.values()))
+
+        self.cursor.execute(sql_update_groups_table_query_template)
+        self.conn.commit()

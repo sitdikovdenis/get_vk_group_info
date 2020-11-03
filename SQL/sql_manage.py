@@ -12,7 +12,8 @@ with sql_query.SQL() as sql:
     for group in settings.groups:
         group_name = group.split('/')[1]
         group_id = vk.get_group_id(group_name)
-        sql.update_group(group_id, group_name)
+        sql.update_table(table_name='vk_group', fields={"group_name": group_name,
+                                                        "group_id": group_id})
 
     groups = sql.get_group_by_id()
     print(groups)
@@ -23,6 +24,7 @@ with sql_query.SQL() as sql:
 # conn.commit()
 #
 #
-#
-# a = cursor.execute("""select * from vk_group_info""")
+# conn = sqlite3.connect("mydatabase.db")
+# cursor = conn.cursor()
+# a = cursor.execute("""select * from vk_group""")
 # print(cursor.fetchall())

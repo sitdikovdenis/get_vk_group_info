@@ -18,7 +18,7 @@ group_table_fields = ["group_name VARCHAR(256) NOT NULL",
                       "group_id INTEGER PRIMARY KEY"
                       ]
 
-group_info_table_fields = ["id integer PRIMARY KEY",
+group_info_table_fields = ["id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,",
                            "user_count INTEGER",
                            "group_id INTEGER",
                            "FOREIGN KEY (group_id) REFERENCES vk_group (group_id)"
