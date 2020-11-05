@@ -1,8 +1,6 @@
-import os
 from vk_integration import vk_api
 import settings
 from SQL import sql_query
-import celery
 
 with sql_query.SQL() as sql:
     vk = vk_api.VKAPI(settings.access_token)
