@@ -41,9 +41,6 @@ class VKAPI:
         except Exception as err:
             print(err)
 
-
-
-
     def get_group_members_count(self, group_id):
         params = {
             'group_id': group_id,

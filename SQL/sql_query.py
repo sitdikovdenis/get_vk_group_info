@@ -14,18 +14,6 @@ class SQL:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
-    def get_field(self, field_name, table_name, **kwargs):
-        query = \
-            f"""select {field_name}
-                from {table_name}
-                where (%s)
-             """ % (','.join(f"'{str(field)}'" for field in kwargs),
-                        ','.join(f"'{str(field)}'" for field in kwargs.values()))
-
-        self.cursor.execute(query)
-        self.conn.commit()
-        return self.cursor.fetchall()
-
     def get_group_by_id(self, id=-1):
         """
         Получить группу
